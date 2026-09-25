@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recomendação de abordagem</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1f2933; --muted:#6b7280; --line:#e5e7eb; --accent:#2b6cb0; --warn:#c05621; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: -apple-system, system-ui, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.4rem; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
+  .card h2 { font-size: 1rem; margin: 0 0 12px; }
+  .presets { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .presets button { border:1px solid var(--line); background:#fff; border-radius:999px; padding:6px 12px; cursor:pointer; font-size:.85rem; }
+  .presets button:hover { border-color: var(--accent); color: var(--accent); }
+  fieldset { border:0; padding:0; margin:0 0 10px; }
+  legend { font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+  .row { display:grid; grid-template-columns: 1fr 1fr; gap:8px 12px; }
+  label { display:flex; flex-direction:column; font-size:.85rem; gap:3px; }
+  input, select { padding:7px 8px; border:1px solid var(--line); border-radius:6px; font-size:.9rem; background:#fff; }
+  .actions { display:flex; gap:10px; align-items:center; margin-top:12px; }
+  .btn { background: var(--accent); color:#fff; border:0; border-radius:8px; padding:10px 16px; font-size:.95rem; cursor:pointer; }
+  .btn.secondary { background:#fff; color:var(--accent); border:1px solid var(--accent); }
+  .result { min-height: 200px; }
+  .big { font-size: 1.6rem; font-weight: 700; margin: 8px 0 2px; }
+  .prop { font-size: 2.4rem; font-weight: 700; color: var(--accent); }
+  .tag { display:inline-block; font-size:.75rem; padding:3px 8px; border-radius:999px; background:#fff3e8; color:var(--warn); border:1px solid #f5c9a8; margin-left:8px; }
+  .muted { color: var(--muted); font-size:.9rem; }
+  .hist { margin-top:14px; border-top:1px solid var(--line); padding-top:10px; font-size:.85rem; }
+  .hist div { display:flex; justify-content:space-between; padding:3px 0; }
+  .bar { height:8px; background:#e5e7eb; border-radius:4px; overflow:hidden; margin-top:4px; }
+  .bar span { display:block; height:100%; background:var(--accent); }
+  .err { color: #b91c1c; white-space: pre-wrap; font-size:.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Recomendação de abordagem · Multi-Armed Bandit</h1>
+  <p class="sub">Informe o contexto do cliente. A política (Thompson Sampling) decide <strong>por qual canal e em que dia ligar</strong>; o modelo de recompensa estima a <strong>propensão</strong> de conversão.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Cliente</h2>
+      <div class="presets" id="presets"></div>
+      <form id="f">
+        <fieldset><legend>Perfil</legend>
+          <div class="row">
+            <label>Idade <input name="age" type="number" min="17" max="100" required></label>
+            <label>Profissão <select name="job"></select></label>
+            <label>Estado civil <select name="marital"></select></label>
+            <label>Escolaridade <select name="education"></select></label>
+            <label>Inadimplente? <select name="default"></select></label>
+            <label>Financiamento imobiliário? <select name="housing"></select></label>
+            <label>Empréstimo pessoal? <select name="loan"></select></label>
+            <label>Mês do contato <select name="month"></select></label>
+          </div>
+        </fieldset>
+        <fieldset><legend>Histórico de campanha</legend>
+          <div class="row">
+            <label>Contatos nesta campanha <input name="campaign" type="number" min="1" required></label>
+            <label>Dias desde o último contato (999 = nunca) <input name="pdays" type="number" min="0" max="999" required></label>
+            <label>Contatos em campanhas anteriores <input name="previous" type="number" min="0" required></label>
+            <label>Resultado da campanha anterior <select name="poutcome"></select></label>
+          </div>
+        </fieldset>
+        <fieldset><legend>Contexto econômico</legend>
+          <div class="row">
+            <label>Variação do emprego <input name="emp_var_rate" type="number" step="0.1" required></label>
+            <label>Índice de preços <input name="cons_price_idx" type="number" step="0.001" required></label>
+            <label>Confiança do consumidor <input name="cons_conf_idx" type="number" step="0.1" required></label>
+            <label>Euribor 3 meses <input name="euribor3m" type="number" step="0.001" required></label>
+            <label>Nº de empregados <input name="nr_employed" type="number" step="0.1" required></label>
+          </div>
+        </fieldset>
+        <div class="actions">
+          <button class="btn" type="submit">Recomendar (com sorteio)</button>
+          <button class="btn secondary" type="button" id="det">Sem sorteio</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card result">
+      <h2>Decisão</h2>
+      <div id="out" class="muted">Escolha um cliente de exemplo ou preencha o formulário.</div>
+      <div class="hist" id="hist" hidden>
+        <div class="muted" style="justify-content:flex-start">Últimas decisões para este cliente (mostra a exploração):</div>
+        <div id="histlist"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const OPT = {
+  job: ["admin.","blue-collar","entrepreneur","housemaid","management","retired","self-employed","services","student","technician","unemployed","unknown"],
+  marital: ["divorced","married","single","unknown"],
+  education: ["basic.4y","basic.6y","basic.9y","high.school","illiterate","professional.course","university.degree","unknown"],
+  default: ["no","yes","unknown"], housing: ["no","yes","unknown"], loan: ["no","yes","unknown"],
+  month: ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],
+  poutcome: ["failure","nonexistent","success"],
+};
+const DIA = {mon:"segunda-feira", tue:"terça-feira", wed:"quarta-feira", thu:"quinta-feira", fri:"sexta-feira"};
+const CANAL = {cellular:"celular", telephone:"telefone fixo"};
+const PRESETS = {"A · Já aceitou antes": {"age": 36,"campaign": 1,"pdays": 3,"previous": 4,"emp_var_rate": -1.7,"cons_price_idx": 94.055,"cons_conf_idx": -39.8,"euribor3m": 0.72,"nr_employed": 4991.6,"job": "management","marital": "divorced","education": "university.degree","default": "no","housing": "yes","loan": "no","poutcome": "success","month": "jun"},"B · Estudante nunca contatado": {"age": 23,"campaign": 1,"pdays": 999,"previous": 0,"emp_var_rate": -1.8,"cons_price_idx": 93.369,"cons_conf_idx": -34.8,"euribor3m": 0.644,"nr_employed": 5008.7,"job": "student","marital": "single","education": "high.school","default": "no","housing": "no","loan": "no","poutcome": "nonexistent","month": "mar"},"C · Aposentado, falha anterior": {"age": 74,"campaign": 2,"pdays": 14,"previous": 2,"emp_var_rate": -1.8,"cons_price_idx": 93.749,"cons_conf_idx": -34.6,"euribor3m": 0.643,"nr_employed": 5008.7,"job": "retired","marital": "divorced","education": "basic.4y","default": "no","housing": "no","loan": "yes","poutcome": "failure","month": "apr"},"D · Insistência em juros altos": {"age": 59,"campaign": 6,"pdays": 999,"previous": 0,"emp_var_rate": 1.4,"cons_price_idx": 93.918,"cons_conf_idx": -42.7,"euribor3m": 4.962,"nr_employed": 5228.1,"job": "blue-collar","marital": "divorced","education": "basic.4y","default": "unknown","housing": "no","loan": "yes","poutcome": "nonexistent","month": "jul"},"E · Idoso com sucesso anterior": {"age": 77,"campaign": 1,"pdays": 3,"previous": 1,"emp_var_rate": -3.4,"cons_price_idx": 92.649,"cons_conf_idx": -30.1,"euribor3m": 0.714,"nr_employed": 5017.5,"job": "retired","marital": "married","education": "unknown","default": "no","housing": "yes","loan": "no","poutcome": "success","month": "nov"}};
+const f = document.getElementById("f");
+for (const [name, vals] of Object.entries(OPT)) {
+  const sel = f.elements[name];
+  vals.forEach(v => { const o = document.createElement("option"); o.value = o.textContent = v; sel.appendChild(o); });
+}
+const presets = document.getElementById("presets");
+for (const [nome, c] of Object.entries(PRESETS)) {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = nome;
+  b.onclick = () => { for (const [k, v] of Object.entries(c)) f.elements[k].value = v; hist = []; renderHist(); document.getElementById("out").innerHTML = '<span class="muted">Cliente carregado. Clique em Recomendar.</span>'; };
+  presets.appendChild(b);
+}
+let hist = [];
+function renderHist() {
+  const box = document.getElementById("hist"); const list = document.getElementById("histlist");
+  box.hidden = hist.length < 2; list.innerHTML = "";
+  const cnt = {}; hist.forEach(a => cnt[a] = (cnt[a] || 0) + 1);
+  Object.entries(cnt).sort((a, b) => b[1] - a[1]).forEach(([a, n]) => {
+    const [c, d] = a.split("_");
+    list.innerHTML += `<div><span>${CANAL[c]} · ${DIA[d]}</span><span>${n} de ${hist.length}</span></div><div class="bar"><span style="width:${100*n/hist.length}%"></span></div>`;
+  });
+}
+async function pedir(sample) {
+  const body = {}; for (const el of f.elements) if (el.name) body[el.name] = el.type === "number" ? Number(el.value) : el.value;
+  const out = document.getElementById("out");
+  try {
+    const r = await fetch(`/recommend?sample=${sample}`, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+    const j = await r.json();
+    if (!r.ok) { out.innerHTML = `<div class="err">Entrada rejeitada pela API (HTTP ${r.status}):\n${JSON.stringify(j.detail, null, 1)}</div>`; return; }
+    const p = Math.round(100 * j.propensity);
+    const prioridade = p >= 40 ? "alta" : p >= 15 ? "média" : "baixa";
+    out.innerHTML = `
+      <div class="muted">Ligar por</div>
+      <div class="big">${CANAL[j.contact]} · ${DIA[j.day_of_week]} ${j.explore ? '<span class="tag">exploração</span>' : ''}</div>
+      <div class="muted" style="margin-top:10px">Propensão de conversão deste cliente</div>
+      <div class="prop">${p}%</div>
+      <div class="muted">Prioridade da ligação: <strong>${prioridade}</strong></div>
+      <div class="muted" style="margin-top:12px">A política acredita em ${(100*j.policy_mean).toFixed(1)}% de conversão média para este braço.
+      ${j.best_arm_for_client !== j.arm ? `Para este cliente em particular, o modelo estima que <strong>${CANAL[j.best_arm_for_client.split("_")[0]]} · ${DIA[j.best_arm_for_client.split("_")[1]]}</strong> renderia ${Math.round(100*j.best_arm_propensity)}%.` : "Este é também o melhor braço estimado para este cliente."}</div>`;
+    if (sample) { hist.push(j.arm); if (hist.length > 30) hist.shift(); renderHist(); }
+  } catch (e) { out.innerHTML = `<div class="err">Falha ao chamar a API: ${e}</div>`; }
+}
+f.addEventListener("submit", e => { e.preventDefault(); pedir(true); });
+document.getElementById("det").onclick = () => pedir(false);
+</script>
+</body>
+</html>

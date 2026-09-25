@@ -107,11 +107,13 @@ Código: `src/datathon/api.py` (FastAPI). Usa a mesma função `datathon.recomme
 
 ```bash
 uv run uvicorn datathon.api:app --reload
+# página de demonstração: http://127.0.0.1:8000/   (formulário com os 5 clientes do Golden Set)
 # documentação interativa: http://127.0.0.1:8000/docs
 ```
 
 | Endpoint | Função |
 |---|---|
+| `GET /` | página de demonstração (formulário em português; chama `/recommend`) |
 | `GET /health` | status e lista de braços |
 | `GET /policy` | crenças atuais (α, β, média) do Thompson Sampling por braço |
 | `POST /recommend` | recebe o contexto do cliente e devolve canal, dia, propensão e se a decisão foi exploratória. `?sample=false` devolve o braço de maior média (determinístico) |
@@ -123,14 +125,14 @@ curl -s -X POST "http://127.0.0.1:8000/recommend" -H "Content-Type: application/
   "age": 36, "job": "management", "marital": "divorced", "education": "university.degree",
   "default": "no", "housing": "yes", "loan": "no", "month": "jun",
   "campaign": 1, "pdays": 3, "previous": 4, "poutcome": "success",
-  "emp_var_rate": -2.9, "cons_price_idx": 92.963, "cons_conf_idx": -40.8,
-  "euribor3m": 0.72, "nr_employed": 5076.2}'
+  "emp_var_rate": -1.7, "cons_price_idx": 94.055, "cons_conf_idx": -39.8,
+  "euribor3m": 0.72, "nr_employed": 4991.6}'
 ```
 
 ```json
 {"arm": "cellular_wed", "contact": "cellular", "day_of_week": "wed",
- "propensity": 0.67, "policy_mean": 0.126, "explore": false,
- "best_arm_for_client": "cellular_fri", "best_arm_propensity": 0.67}
+ "propensity": 0.87, "policy_mean": 0.126, "explore": false,
+ "best_arm_for_client": "cellular_wed", "best_arm_propensity": 0.87}
 ```
 
 Entradas fora do domínio (ex.: `job = "astronauta"`) são rejeitadas com HTTP 422 pela validação do Pydantic. Os artefatos em `models/` são gerados pelos notebooks 02 e 03; sem eles a API não sobe.

@@ -7,7 +7,7 @@ Peso da avaliação: 30% negócio (blocos 1 e 5), 70% técnico (blocos 2, 3 e 4)
 - [ ] `uv sync` feito; `models/` gerado (notebooks 02 e 03 executados).
 - [ ] Terminal 1: `uv run uvicorn datathon.api:app` já rodando.
 - [ ] Terminal 2: `uv run mlflow ui` já rodando.
-- [ ] Navegador com 3 abas: `localhost:8000/docs`, `localhost:5000`, README no GitHub.
+- [ ] Navegador com 3 abas: `localhost:8000/` (página de demo), `localhost:5000`, README no GitHub.
 - [ ] Jupyter aberto no notebook `02_baseline_bandit`, rolado até o gráfico "Regra fixa: depende de acertar o braço".
 - [ ] Fonte do terminal aumentada; notificações desligadas.
 
@@ -33,13 +33,13 @@ Peso da avaliação: 30% negócio (blocos 1 e 5), 70% técnico (blocos 2, 3 e 4)
 >
 > Escolhemos Thompson Sampling e não epsilon-greedy porque ele não tem parâmetro de exploração: começa com uma crença uniforme por braço, Beta(1,1), e a exploração diminui sozinha conforme as crenças se estreitam. [rolar até o gráfico de participação dos braços] Aqui se vê: no início espalha, depois concentra nos braços de celular.
 
-## Bloco 4 · Demonstração ao vivo (3:00 – 4:15) — tela: navegador, `localhost:8000/docs`
+## Bloco 4 · Demonstração ao vivo (3:00 – 4:15) — tela: navegador, `localhost:8000/`
 
-> A política final são dez pares alfa e beta, salvos em JSON, e a API carrega isso na subida. [abrir `POST /recommend`, clicar Try it out] O cliente chega com o contexto: idade, profissão, histórico, indicadores econômicos. Canal e dia **não** são entrada, são a resposta.
+> A política final são dez pares alfa e beta, salvos em JSON, e a API carrega isso na subida. [mostrar o formulário] O cliente chega com o contexto: perfil, histórico, indicadores econômicos. Canal e dia **não** são entrada, são a resposta.
 >
-> [colar o cliente A do Golden Set, executar] Resposta: celular na quarta, propensão de 87%, porque este cliente já aceitou a campanha anterior. [executar de novo] Chamando de novo pode vir celular na terça marcado como exploração: é o bandit continuando a aprender.
+> [clicar no preset "A · Já aceitou antes", depois Recomendar] Resposta: celular na quarta, propensão de 87%, prioridade alta, porque este cliente já aceitou a campanha anterior. [clicar Recomendar mais 4 ou 5 vezes] Às vezes vem celular na terça com a etiqueta "exploração", e o histórico embaixo mostra a distribuição: é o bandit continuando a aprender.
 >
-> [trocar `poutcome` para `nonexistent` e `campaign` para 6, executar] Mesmo braço, propensão de 5%: o banco sabe que essa ligação tem prioridade baixa. [trocar `job` para um valor inválido] E a API rejeita entradas fora do domínio.
+> [preset "D · Insistência em juros altos", Recomendar] Mesmo braço, propensão de 5%, prioridade baixa: o banco sabe que essa ligação vale pouco. [preset "E", Recomendar] E aqui o modelo avisa que, para este idoso, telefone fixo renderia mais: o limite da política sem contexto, que a gente assume.
 
 ## Bloco 5 · MLflow, nuvem e limites (4:15 – 5:00) — tela: `localhost:5000`, depois README "Arquitetura"
 
@@ -54,11 +54,12 @@ Peso da avaliação: 30% negócio (blocos 1 e 5), 70% técnico (blocos 2, 3 e 4)
 ## Cliente A para colar na demo
 
 ```json
-{"age": 36, "job": "management", "marital": "divorced", "education": "university.degree",
- "default": "no", "housing": "yes", "loan": "no", "month": "jun",
- "campaign": 1, "pdays": 3, "previous": 4, "poutcome": "success",
- "emp_var_rate": -2.9, "cons_price_idx": 92.963, "cons_conf_idx": -40.8,
- "euribor3m": 0.72, "nr_employed": 5076.2}
+{
+  "age": 36, "job": "management", "marital": "divorced", "education": "university.degree",
+  "default": "no", "housing": "yes", "loan": "no", "month": "jun",
+  "campaign": 1, "pdays": 3, "previous": 4, "poutcome": "success",
+  "emp_var_rate": -1.7, "cons_price_idx": 94.055, "cons_conf_idx": -39.8,
+  "euribor3m": 0.72, "nr_employed": 4991.6}
 ```
 
 ## Se sobrar tempo, perguntas prováveis da banca

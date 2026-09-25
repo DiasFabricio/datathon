@@ -38,3 +38,10 @@ def test_recommend_valida_entrada():
         assert c.post("/recommend", json=ruim).status_code == 422
         faltando = {k: v for k, v in CLIENTE.items() if k != "euribor3m"}
         assert c.post("/recommend", json=faltando).status_code == 422
+
+
+@precisa_artefatos
+def test_pagina_de_demonstracao():
+    with TestClient(app) as c:
+        r = c.get("/")
+        assert r.status_code == 200 and "Recomendar" in r.text

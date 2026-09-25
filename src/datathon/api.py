@@ -1,7 +1,8 @@
 """API de recomendação (Etapa 5).
 
     uv run uvicorn datathon.api:app --reload
-    → http://127.0.0.1:8000/docs  (documentação interativa gerada pelo FastAPI)
+    → http://127.0.0.1:8000/       (página de demonstração)
+    → http://127.0.0.1:8000/docs   (documentação interativa gerada pelo FastAPI)
 
 Recebe os dados de um cliente e devolve por qual canal e em que dia ligar
 (decisão do Thompson Sampling) e a propensão de conversão (modelo de recompensa).
@@ -13,7 +14,10 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 from typing import Literal
 
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
 from datathon import __version__
@@ -81,6 +85,12 @@ app = FastAPI(
     version=__version__,
     lifespan=lifespan,
 )
+
+
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+def demo_page():
+    """Página de demonstração: formulário em português que chama /recommend."""
+    return (Path(__file__).parent / "static" / "index.html").read_text(encoding="utf-8")
 
 
 @app.get("/health")
