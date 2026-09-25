@@ -8,93 +8,73 @@
   :root { --bg:#f6f7f9; --card:#fff; --ink:#1f2933; --muted:#6b7280; --line:#e5e7eb; --accent:#2b6cb0; --warn:#c05621; }
   * { box-sizing: border-box; }
   body { margin:0; font-family: -apple-system, system-ui, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--ink); }
-  main { max-width: 1000px; margin: 0 auto; padding: 24px 16px; }
-  h1 { font-size: 1.4rem; margin: 0 0 4px; }
-  .sub { color: var(--muted); margin: 0 0 20px; }
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 1.3rem; margin: 0 0 16px; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
   @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px; }
-  .card h2 { font-size: 1rem; margin: 0 0 12px; }
-  .presets { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .presets { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
   .presets button { border:1px solid var(--line); background:#fff; border-radius:999px; padding:6px 12px; cursor:pointer; font-size:.85rem; }
-  .presets button:hover { border-color: var(--accent); color: var(--accent); }
-  fieldset { border:0; padding:0; margin:0 0 10px; }
-  legend { font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+  .presets button.on, .presets button:hover { border-color: var(--accent); color: var(--accent); }
   .row { display:grid; grid-template-columns: 1fr 1fr; gap:8px 12px; }
   label { display:flex; flex-direction:column; font-size:.85rem; gap:3px; }
   input, select { padding:7px 8px; border:1px solid var(--line); border-radius:6px; font-size:.9rem; background:#fff; }
-  .actions { display:flex; gap:10px; align-items:center; margin-top:12px; }
-  .btn { background: var(--accent); color:#fff; border:0; border-radius:8px; padding:10px 16px; font-size:.95rem; cursor:pointer; }
-  .btn.secondary { background:#fff; color:var(--accent); border:1px solid var(--accent); }
-  .result { min-height: 200px; }
-  .big { font-size: 1.6rem; font-weight: 700; margin: 8px 0 2px; }
-  .prop { font-size: 2.4rem; font-weight: 700; color: var(--accent); }
-  .tag { display:inline-block; font-size:.75rem; padding:3px 8px; border-radius:999px; background:#fff3e8; color:var(--warn); border:1px solid #f5c9a8; margin-left:8px; }
+  details { margin-top:10px; font-size:.85rem; color:var(--muted); }
+  details .row { margin-top:8px; }
+  .btn { width:100%; margin-top:14px; background: var(--accent); color:#fff; border:0; border-radius:8px; padding:12px; font-size:1rem; cursor:pointer; }
+  .big { font-size: 1.7rem; font-weight: 700; margin: 6px 0; }
+  .prop { font-size: 2.6rem; font-weight: 700; color: var(--accent); line-height:1.1; }
+  .tag { display:inline-block; font-size:.75rem; padding:3px 8px; border-radius:999px; background:#fff3e8; color:var(--warn); border:1px solid #f5c9a8; vertical-align:middle; }
   .muted { color: var(--muted); font-size:.9rem; }
-  .hist { margin-top:14px; border-top:1px solid var(--line); padding-top:10px; font-size:.85rem; }
-  .hist div { display:flex; justify-content:space-between; padding:3px 0; }
-  .bar { height:8px; background:#e5e7eb; border-radius:4px; overflow:hidden; margin-top:4px; }
+  .hist { margin-top:16px; border-top:1px solid var(--line); padding-top:10px; font-size:.85rem; }
+  .hist div.l { display:flex; justify-content:space-between; padding:4px 0 0; }
+  .bar { height:8px; background:#e5e7eb; border-radius:4px; overflow:hidden; margin-top:3px; }
   .bar span { display:block; height:100%; background:var(--accent); }
   .err { color: #b91c1c; white-space: pre-wrap; font-size:.85rem; }
 </style>
 </head>
 <body>
 <main>
-  <h1>Recomendação de abordagem · Multi-Armed Bandit</h1>
-  <p class="sub">Informe o contexto do cliente. A política (Thompson Sampling) decide <strong>por qual canal e em que dia ligar</strong>; o modelo de recompensa estima a <strong>propensão</strong> de conversão.</p>
-
+  <h1>Por qual canal e em que dia ligar para este cliente?</h1>
   <div class="grid">
     <div class="card">
-      <h2>Cliente</h2>
       <div class="presets" id="presets"></div>
       <form id="f">
-        <fieldset><legend>Perfil</legend>
+        <div class="row">
+          <label>Idade <input name="age" type="number" min="17" max="100" required></label>
+          <label>Profissão <select name="job"></select></label>
+          <label>Estado civil <select name="marital"></select></label>
+          <label>Escolaridade <select name="education"></select></label>
+          <label>Financiamento imobiliário <select name="housing"></select></label>
+          <label>Empréstimo pessoal <select name="loan"></select></label>
+          <label>Resultado da campanha anterior <select name="poutcome"></select></label>
+          <label>Contatos nesta campanha <input name="campaign" type="number" min="1" required></label>
+        </div>
+        <details><summary>Histórico e contexto econômico (pré-preenchidos)</summary>
           <div class="row">
-            <label>Idade <input name="age" type="number" min="17" max="100" required></label>
-            <label>Profissão <select name="job"></select></label>
-            <label>Estado civil <select name="marital"></select></label>
-            <label>Escolaridade <select name="education"></select></label>
-            <label>Inadimplente? <select name="default"></select></label>
-            <label>Financiamento imobiliário? <select name="housing"></select></label>
-            <label>Empréstimo pessoal? <select name="loan"></select></label>
+            <label>Inadimplente <select name="default"></select></label>
             <label>Mês do contato <select name="month"></select></label>
-          </div>
-        </fieldset>
-        <fieldset><legend>Histórico de campanha</legend>
-          <div class="row">
-            <label>Contatos nesta campanha <input name="campaign" type="number" min="1" required></label>
             <label>Dias desde o último contato (999 = nunca) <input name="pdays" type="number" min="0" max="999" required></label>
             <label>Contatos em campanhas anteriores <input name="previous" type="number" min="0" required></label>
-            <label>Resultado da campanha anterior <select name="poutcome"></select></label>
-          </div>
-        </fieldset>
-        <fieldset><legend>Contexto econômico</legend>
-          <div class="row">
             <label>Variação do emprego <input name="emp_var_rate" type="number" step="0.1" required></label>
             <label>Índice de preços <input name="cons_price_idx" type="number" step="0.001" required></label>
             <label>Confiança do consumidor <input name="cons_conf_idx" type="number" step="0.1" required></label>
             <label>Euribor 3 meses <input name="euribor3m" type="number" step="0.001" required></label>
             <label>Nº de empregados <input name="nr_employed" type="number" step="0.1" required></label>
           </div>
-        </fieldset>
-        <div class="actions">
-          <button class="btn" type="submit">Recomendar (com sorteio)</button>
-          <button class="btn secondary" type="button" id="det">Sem sorteio</button>
-        </div>
+        </details>
+        <button class="btn" type="submit">Recomendar</button>
       </form>
     </div>
-
-    <div class="card result">
-      <h2>Decisão</h2>
-      <div id="out" class="muted">Escolha um cliente de exemplo ou preencha o formulário.</div>
+    <div class="card">
+      <div id="out" class="muted">Clique em Recomendar.</div>
       <div class="hist" id="hist" hidden>
-        <div class="muted" style="justify-content:flex-start">Últimas decisões para este cliente (mostra a exploração):</div>
+        <div class="muted">Decisões para este cliente até agora (o bandit continua explorando):</div>
         <div id="histlist"></div>
       </div>
     </div>
   </div>
 </main>
-
 <script>
 const OPT = {
   job: ["admin.","blue-collar","entrepreneur","housemaid","management","retired","self-employed","services","student","technician","unemployed","unknown"],
@@ -112,44 +92,48 @@ for (const [name, vals] of Object.entries(OPT)) {
   const sel = f.elements[name];
   vals.forEach(v => { const o = document.createElement("option"); o.value = o.textContent = v; sel.appendChild(o); });
 }
+let hist = [];
 const presets = document.getElementById("presets");
-for (const [nome, c] of Object.entries(PRESETS)) {
-  const b = document.createElement("button"); b.type = "button"; b.textContent = nome;
-  b.onclick = () => { for (const [k, v] of Object.entries(c)) f.elements[k].value = v; hist = []; renderHist(); document.getElementById("out").innerHTML = '<span class="muted">Cliente carregado. Clique em Recomendar.</span>'; };
+function carregar(nome) {
+  for (const [k, v] of Object.entries(PRESETS[nome])) f.elements[k].value = v;
+  hist = []; renderHist();
+  document.getElementById("out").innerHTML = '<span class="muted">Clique em Recomendar.</span>';
+  [...presets.children].forEach(b => b.classList.toggle("on", b.textContent === nome));
+}
+for (const nome of Object.keys(PRESETS)) {
+  const b = document.createElement("button"); b.type = "button"; b.textContent = nome; b.onclick = () => carregar(nome);
   presets.appendChild(b);
 }
-let hist = [];
+carregar(Object.keys(PRESETS)[0]);   // abre já preenchido com o cliente A
+
 function renderHist() {
-  const box = document.getElementById("hist"); const list = document.getElementById("histlist");
+  const box = document.getElementById("hist"), list = document.getElementById("histlist");
   box.hidden = hist.length < 2; list.innerHTML = "";
   const cnt = {}; hist.forEach(a => cnt[a] = (cnt[a] || 0) + 1);
   Object.entries(cnt).sort((a, b) => b[1] - a[1]).forEach(([a, n]) => {
     const [c, d] = a.split("_");
-    list.innerHTML += `<div><span>${CANAL[c]} · ${DIA[d]}</span><span>${n} de ${hist.length}</span></div><div class="bar"><span style="width:${100*n/hist.length}%"></span></div>`;
+    list.innerHTML += `<div class="l"><span>${CANAL[c]} · ${DIA[d]}</span><span>${n} de ${hist.length}</span></div><div class="bar"><span style="width:${100*n/hist.length}%"></span></div>`;
   });
 }
-async function pedir(sample) {
+f.addEventListener("submit", async e => {
+  e.preventDefault();
   const body = {}; for (const el of f.elements) if (el.name) body[el.name] = el.type === "number" ? Number(el.value) : el.value;
   const out = document.getElementById("out");
   try {
-    const r = await fetch(`/recommend?sample=${sample}`, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
+    const r = await fetch("/recommend", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(body)});
     const j = await r.json();
-    if (!r.ok) { out.innerHTML = `<div class="err">Entrada rejeitada pela API (HTTP ${r.status}):\n${JSON.stringify(j.detail, null, 1)}</div>`; return; }
-    const p = Math.round(100 * j.propensity);
-    const prioridade = p >= 40 ? "alta" : p >= 15 ? "média" : "baixa";
-    out.innerHTML = `
-      <div class="muted">Ligar por</div>
+    if (!r.ok) { out.innerHTML = `<div class="err">Entrada rejeitada (HTTP ${r.status}):\n${JSON.stringify(j.detail, null, 1)}</div>`; return; }
+    const p = Math.round(100 * j.propensity), prioridade = p >= 40 ? "alta" : p >= 15 ? "média" : "baixa";
+    const outro = j.best_arm_for_client !== j.arm
+      ? `<div class="muted" style="margin-top:12px">Para este cliente em particular, o modelo estima que <strong>${CANAL[j.best_arm_for_client.split("_")[0]]} · ${DIA[j.best_arm_for_client.split("_")[1]]}</strong> renderia ${Math.round(100*j.best_arm_propensity)}%.</div>` : "";
+    out.innerHTML = `<div class="muted">Ligar por</div>
       <div class="big">${CANAL[j.contact]} · ${DIA[j.day_of_week]} ${j.explore ? '<span class="tag">exploração</span>' : ''}</div>
-      <div class="muted" style="margin-top:10px">Propensão de conversão deste cliente</div>
+      <div class="muted" style="margin-top:10px">Chance de este cliente aceitar</div>
       <div class="prop">${p}%</div>
-      <div class="muted">Prioridade da ligação: <strong>${prioridade}</strong></div>
-      <div class="muted" style="margin-top:12px">A política acredita em ${(100*j.policy_mean).toFixed(1)}% de conversão média para este braço.
-      ${j.best_arm_for_client !== j.arm ? `Para este cliente em particular, o modelo estima que <strong>${CANAL[j.best_arm_for_client.split("_")[0]]} · ${DIA[j.best_arm_for_client.split("_")[1]]}</strong> renderia ${Math.round(100*j.best_arm_propensity)}%.` : "Este é também o melhor braço estimado para este cliente."}</div>`;
-    if (sample) { hist.push(j.arm); if (hist.length > 30) hist.shift(); renderHist(); }
-  } catch (e) { out.innerHTML = `<div class="err">Falha ao chamar a API: ${e}</div>`; }
-}
-f.addEventListener("submit", e => { e.preventDefault(); pedir(true); });
-document.getElementById("det").onclick = () => pedir(false);
+      <div class="muted">Prioridade da ligação: <strong>${prioridade}</strong></div>${outro}`;
+    hist.push(j.arm); if (hist.length > 30) hist.shift(); renderHist();
+  } catch (err) { out.innerHTML = `<div class="err">Falha ao chamar a API: ${err}</div>`; }
+});
 </script>
 </body>
 </html>
