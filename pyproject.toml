@@ -1,0 +1,33 @@
+[project]
+name = "datathon"
+version = "0.1.0"
+description = "Datathon POSTECH MLET - experimentação adaptativa com multi-armed bandit para ofertas bancárias"
+authors = [
+    { name = "Fabrício Dias", email = "fabricio@wejam.email" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.141.1",
+    "mlflow>=3.16.1",
+    "numpy>=2.5.3",
+    "pandas>=3.0.6",
+    "pydantic>=2.13.5",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.3.0",
+    "jupyterlab>=4.6.4",
+    "kaggle>=2.2.4",
+    "matplotlib>=3.11.2",
+    "pytest>=9.1.1",
+    "ruff>=0.16.9",
+    "seaborn>=0.13.2",
+]

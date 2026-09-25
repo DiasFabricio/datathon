@@ -1,0 +1,35 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Dados (nunca versionar base bruta; o README aponta o link do Kaggle)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# macOS
+.DS_Store
+
+# Credenciais
+.env
+kaggle.json
+
+# Modelos treinados (regenerados pelos notebooks)
+models/*
+!models/.gitkeep
+mlflow.db
